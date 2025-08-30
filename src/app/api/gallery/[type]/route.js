@@ -18,20 +18,17 @@ export async function GET(request, { params }) {
     const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
 
-    const mmm = await supabase.storage.getBucket('Gallery')
-    console.log("BBBBBBBBBBBBBBBBBBBBBBBB",mmm)
-
     // Liste les fichiers dans le sous-dossier correspondant (ex: cafe/, matcha/, latte/)
     const { data, error } = await supabase.storage
       .from("Gallery")
-      .list(`${type}/`, { limit: 100 })
+      .list(`${type}/`)
 
     if (error) throw error
 
     // Génération des URLs publiques
     const files = data.map((file) => {
       const { data: urlData } = supabase.storage
-        .from("Gallery")
+        .from(`Gallery`)
         .getPublicUrl(`${type}/${file.name}`)
 
       return {
@@ -47,9 +44,7 @@ export async function GET(request, { params }) {
       height: 20,
     }))
 
-    
-    const { data: todos } = await supabase.storage.listBuckets()
-    return new Response(JSON.stringify({ data: todos }), { status: 200 })
+    return new Response(JSON.stringify({ data: images }), { status: 200 })
   } catch (err) {
     return new Response(
       JSON.stringify({ error: err.message }),

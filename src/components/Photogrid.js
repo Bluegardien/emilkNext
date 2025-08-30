@@ -11,7 +11,7 @@ function Photogrid({ folder = "cafe" }) {
     const fetchImages = async () => {
       try {
         const res = await fetch(`/api/gallery/${folder}`);
-        const data = await res.json();
+        const { data } = await res.json();
         setImagesArray(Array.isArray(data) ? data : []);
       } catch (err) {
         setImagesArray([]);
@@ -22,15 +22,7 @@ function Photogrid({ folder = "cafe" }) {
     fetchImages();
   }, [folder]);
 
-  const safeImages = imagesArray?.length
-    ? imagesArray
-    : [
-        {
-          src: "/Gallery/matcha/matcha.jpeg",
-          width: 20,
-          height: 30,
-        },
-      ];
+  const safeImages = imagesArray
 
   return (
     <div className="p-10 pt-[12vh] text-center">
