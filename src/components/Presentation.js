@@ -19,8 +19,8 @@ function Presentation() {
         >
           <TextAnimation text={t("hero")} />
         </h1>
-        <div className="relative h-full w-fit m-1.5 border-4 border-[#D5B16C] rounded-[15px]">
-          <Image
+        <div className="relative h-[100%] w-fit m-1.5">
+          <img
             src="/emil.jpeg"
             alt="Emil"
             fill
