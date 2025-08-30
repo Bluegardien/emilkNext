@@ -1,32 +1,59 @@
-import { createClient } from "@supabase/supabase-js";
-import process from "process";
+import { createClient } from '@/utils/supabase/server'
+import { cookies } from 'next/headers'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// Types valides
-const validTypes = ["cafe", "matcha", "latte"];
+const validTypes = ["cafe", "matcha", "latte"]
 
 export async function GET(request, { params }) {
+  const { type } = await params
+
+  if (!validTypes.includes(type)) {
+    return new Response(
+      JSON.stringify({ error: "Invalid gallery type" }),
+      { status: 400 }
+    )
+  }
+
   try {
-    const { type } = await params;
+    // Création du client Supabase lié aux cookies (auth server-side)
+    const cookieStore = await cookies()
+    const supabase = createClient(cookieStore)
 
-    if (!validTypes.includes(type)) {
-      return new Response(JSON.stringify({ error: "Invalid gallery type" }), { status: 400 });
-    }
-    // Liste des fichiers dans le dossier correspondant du storage "Gallery"
-    const { data, error } = await supabase.storage.from("Gallery").list('');
-    if (error) throw error;
+    const mmm = await supabase.storage.getBucket('Gallery')
+    console.log("BBBBBBBBBBBBBBBBBBBBBBBB",mmm)
 
-    const images = data.map((f, i) => ({
-      src: `${SUPABASE_URL}/storage/v1/object/public/Gallery/${type}/${f.name}`,
+    // Liste les fichiers dans le sous-dossier correspondant (ex: cafe/, matcha/, latte/)
+    const { data, error } = await supabase.storage
+      .from("Gallery")
+      .list(`${type}/`, { limit: 100 })
+
+    if (error) throw error
+
+    // Génération des URLs publiques
+    const files = data.map((file) => {
+      const { data: urlData } = supabase.storage
+        .from("Gallery")
+        .getPublicUrl(`${type}/${file.name}`)
+
+      return {
+        name: file.name,
+        url: urlData.publicUrl,
+      }
+    })
+
+    // Formatage pour ton front (gallery compatible)
+    const images = files.map((file) => ({
+      src: file.url,
       width: 30,
       height: 20,
-    }));
+    }))
 
-    return new Response(JSON.stringify({"data":data,"error":error}), { status: 200 });
+    
+    const { data: todos } = await supabase.storage.listBuckets()
+    return new Response(JSON.stringify({ data: todos }), { status: 200 })
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: err.message }),
+      { status: 500 }
+    )
   }
 }

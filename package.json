@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.55.0",
     "formidable-serverless": "^1.1.1",
     "heic-convert": "^2.1.0",
