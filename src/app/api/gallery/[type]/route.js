@@ -44,7 +44,7 @@ export async function GET(request, { params }) {
       height: 20,
     }))
 
-    return new Response(JSON.stringify({ data: images }), { status: 200 })
+    return new Response(JSON.stringify(images), { status: 200 })
   } catch (err) {
     return new Response(
       JSON.stringify({ error: err.message }),

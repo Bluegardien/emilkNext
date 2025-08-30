@@ -37,12 +37,14 @@ function Galleries() {
           }
       };
       fetchImages();
+      console.log("CAFÉ IMAGES:",cafeImg);
     }, []);
 
 
     const handleDelete = async (type, filename) => {
       try {
-        const res = await fetch(`/api/gallery/${type}/delete/${filename}`, { method: 'DELETE' });
+        const res = await fetch(`/api/delete/${type}?filename=${filename}`, { method: 'DELETE' })
+
         const result = await res.json();
 
         if (result.success) {
@@ -70,7 +72,7 @@ function Galleries() {
   if (uploadName) formData.append('name', uploadName);
 
   try {
-    const res = await fetch(`/api/upload/${uploadType}`, {
+    const res = await fetch(`/api/add/${uploadType}`, {
       method: 'POST',
       body: formData,
     });

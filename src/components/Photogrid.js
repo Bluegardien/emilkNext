@@ -11,7 +11,7 @@ function Photogrid({ folder = "cafe" }) {
     const fetchImages = async () => {
       try {
         const res = await fetch(`/api/gallery/${folder}`);
-        const { data } = await res.json();
+        const data = await res.json();
         setImagesArray(Array.isArray(data) ? data : []);
       } catch (err) {
         setImagesArray([]);
